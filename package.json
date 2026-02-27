@@ -1,0 +1,26 @@
+{
+  "name": "mes-saas",
+  "version": "1.0.0",
+  "description": "Full enterprise-grade multi-tenant School Management SaaS",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present",
+    "start": "npm run start --workspaces --if-present",
+    "backend:dev": "npm run start:dev -w backend",
+    "frontend:dev": "npm run dev -w frontend"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "main": "index.js",
+  "type": "commonjs",
+  "dependencies": {
+    "@tanstack/react-table": "^8.21.3",
+    "lodash": "^4.17.23"
+  }
+}

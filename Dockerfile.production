@@ -1,0 +1,30 @@
+# --- BASE STAGE ---
+FROM node:18-alpine AS base
+RUN npm install -g npm@latest
+WORKDIR /app
+
+# --- DEPENDENCIES STAGE ---
+FROM base AS deps
+COPY package*.json ./
+COPY apps/backend/package*.json ./apps/backend/
+COPY apps/frontend/package*.json ./apps/frontend/
+COPY packages/database/package*.json ./packages/database/
+RUN npm install
+
+# --- BUILD STAGE ---
+FROM deps AS builder
+COPY . .
+RUN npx prisma generate --schema packages/database/prisma/schema.prisma
+RUN npm run build
+
+# --- RUNNER STAGE (Production) ---
+FROM base AS runner
+ENV NODE_ENV production
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/apps/backend/dist ./apps/backend/dist
+COPY --from=builder /app/apps/backend/package*.json ./apps/backend/
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/packages/database/prisma ./packages/database/prisma
+
+EXPOSE 3001
+CMD ["node", "apps/backend/dist/main"]
